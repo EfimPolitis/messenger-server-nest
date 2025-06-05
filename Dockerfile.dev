@@ -1,0 +1,17 @@
+# 1. Базовый образ с Node.js для сборки
+FROM node:22-alpine
+
+# Создаём рабочую директорию
+WORKDIR /app
+
+# Копируем yarn.lock
+COPY yarn.lock ./
+
+#Установка зависимостей
+RUN yarn
+
+
+# Копируем весь код
+COPY . .
+
+CMD ["yarn", "start:dev"]
