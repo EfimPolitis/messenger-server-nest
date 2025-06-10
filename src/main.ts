@@ -18,8 +18,8 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.enableCors({
-    // origin: ['http://localhost:3000'],
-    origin: ['https://quick-online.ru'],
+    origin: ['http://localhost:3000'],
+    // origin: ['https://quick-online.ru'],
     credentials: true,
     exposedHeaders: 'set-cookie',
   });

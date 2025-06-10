@@ -14,7 +14,7 @@ export class SocialMediaAuthController {
     private readonly refreshTokenService: RefreshTokenService
   ) {}
 
-  private _CLIENT_BASE_URL = 'https://quick-online.ru/social-auth?accessToken=';
+  private _CLIENT_BASE_URL = 'https://localhost:3000/social-auth?accessToken=';
 
   @Get('google')
   @UseGuards(AuthGuard('google'))

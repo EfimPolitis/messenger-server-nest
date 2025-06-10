@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Role, type User } from '@prisma/client';
 import { verify } from 'argon2';
 import { omit } from 'lodash';
-import { AuthDto } from './dto/auth.dto';
+import { AuthLoginDto, AuthRegisterDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,15 +25,15 @@ export class AuthService {
   private readonly TOKEN_EXPIRATION_ACCESS = '1h';
   private readonly TOKEN_EXPIRATION_REFRESH = '7d';
 
-  async login(dto: AuthDto) {
+  async login(dto: AuthLoginDto) {
     const user = await this.validateUser(dto);
     return this.buildResponseObject(user);
   }
 
-  async register(dto: AuthDto) {
+  async register(dto: AuthRegisterDto) {
     const userExists = await this.userService.getByEmail(dto.email);
     if (userExists) {
-      throw new BadRequestException('User already exists');
+      throw new BadRequestException('Данный пользоватеь уже есть в системе');
     }
     const user = await this.userService.create(dto);
 
@@ -67,7 +67,7 @@ export class AuthService {
       verificationToken: null,
     });
 
-    return 'Email verified!';
+    return 'Почта подтверждена';
   }
 
   async buildResponseObject(user: User) {
@@ -86,14 +86,14 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private async validateUser(dto: AuthDto) {
+  private async validateUser(dto: AuthLoginDto) {
     const user = await this.userService.getByEmail(dto.email);
     if (!user) {
-      throw new UnauthorizedException('Email or password invalid');
+      throw new UnauthorizedException('Неверная почта или пароль');
     }
     const isValid = await verify(user.password, dto.password);
     if (!isValid) {
-      throw new UnauthorizedException('Email or password invalid');
+      throw new UnauthorizedException('Неверная почта или пароль');
     }
     return user;
   }

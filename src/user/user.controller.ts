@@ -1,7 +1,6 @@
 import { Auth } from '@/auth/decorators/auth.decorator';
 import { CurrentUser } from '@/auth/decorators/user.decorator';
-import { Controller, Get } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Controller, Get, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -14,15 +13,9 @@ export class UserController {
     return this.userService.getById(id);
   }
 
-  @Auth([Role.ADMIN])
-  @Get('manager')
-  async getManagerContent() {
-    return { text: 'Manager content' };
-  }
-
-  @Auth(Role.ADMIN)
-  @Get('list')
-  async getList() {
-    return this.userService.getUsers();
+  @Auth()
+  @Get('search/:userData')
+  async getList(@Param('userData') userData: string) {
+    return this.userService.getUsers(userData);
   }
 }

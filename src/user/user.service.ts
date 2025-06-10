@@ -1,4 +1,4 @@
-import { AuthDto } from '@/auth/dto/auth.dto';
+import { AuthRegisterDto } from '@/auth/dto/auth.dto';
 import {
   IGithubProfile,
   IGoogleProfile,
@@ -13,11 +13,35 @@ import { PrismaService } from 'src/prisma.service';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async getUsers() {
+  async getUsers(userData: string) {
     return this.prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            name: {
+              contains: userData,
+              mode: 'insensitive',
+            },
+          },
+          {
+            surname: {
+              contains: userData,
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: userData,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
       select: {
         name: true,
+        surname: true,
         email: true,
+        avatarPath: true,
         id: true,
         password: false,
       },
@@ -70,12 +94,12 @@ export class UserService {
     });
   }
 
-  async create(dto: AuthDto) {
+  async create(dto: AuthRegisterDto) {
     return this.prisma.user.create({
       data: {
-        ...dto,
-        name: '',
-        surname: '',
+        name: dto.name,
+        surname: dto.surname,
+        email: dto.email,
         password: await hash(dto.password),
       },
     });

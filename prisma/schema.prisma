@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id         String  @id @default(cuid())
+  id         String  @id @default(uuid())
   email      String  @unique
   name       String
   surname    String
@@ -17,10 +17,67 @@ model User {
 
   verificationToken String? @default(cuid()) @map("verification_token")
 
-  rights Role @default(USER)
+  rights          Role              @default(USER)
+  Group           Group[]
+  ChatParticipant ChatParticipant[]
+  GroupMember     GroupMember[]
+  Message         Message[]
 }
 
 enum Role {
   USER
   ADMIN
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  text      String?
+  filePath  String?
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  chatId    String?
+  chat      Chat?    @relation(fields: [chatId], references: [id])
+  groupId   String?
+  group     Group?   @relation(fields: [groupId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  deleted   Boolean  @default(false)
+}
+
+model Group {
+  id         String        @id @default(uuid())
+  name       String
+  avatarPath String?
+  inviteCode String        @unique
+  ownerId    String
+  owner      User          @relation(fields: [ownerId], references: [id])
+  members    GroupMember[]
+  messages   Message[]
+}
+
+model GroupMember {
+  id      String @id @default(uuid())
+  groupId String
+  group   Group  @relation(fields: [groupId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model Chat {
+  id           String            @id @default(uuid())
+  participants ChatParticipant[]
+  messages     Message[]
+  createdAt    DateTime          @default(now())
+}
+
+model ChatParticipant {
+  id     String @id @default(uuid())
+  chatId String
+  chat   Chat   @relation(fields: [chatId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([chatId, userId])
 }
