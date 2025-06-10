@@ -39,7 +39,7 @@ export class AuthService {
 
     await this.emailService.sendVerification(
       user.email,
-      `http://localhost:4200/verify-email?token=${user.verificationToken}`
+      `https://quick-online.ru/verify-email?token=${user.verificationToken}`
     );
 
     return this.buildResponseObject(user);
